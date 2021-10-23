@@ -25,8 +25,8 @@ contract MotherfuckingPixel is ERC721 {
   }
 
   struct Canvas {
-    TileInfo[1024] tilesInfo;
-    TileColor[1024] tilesColor;
+    TileInfo[625] tilesInfo;
+    TileColor[625] tilesColor;
     uint256 cvl;
     uint256 startedAt;
     uint16 paintedTilesCount;
@@ -47,30 +47,12 @@ contract MotherfuckingPixel is ERC721 {
     _currentId = 1;
   }
 
-  function getTilesColor(uint8 page) public view returns (TileColor[512] memory) {
-    require(page < 2, "Invalid page");
-    TileColor[512] memory temp;
-    uint16 maximumIndex = (page + 1) * 512;
-    uint16 start = page * 512;
-
-    for (uint16 i = start; i < maximumIndex; i++) {
-      temp[i - start] = gallery[_currentId].tilesColor[i];
-    }
-
-    return temp;
+  function getTilesColor() public view returns (TileColor[625] memory) {
+    return gallery[_currentId].tilesColor;
   }
 
-  function getTilesInfo(uint8 page) public view returns (TileInfo[512] memory) {
-    require(page < 2, "Invalid page");
-    TileInfo[512] memory temp;
-    uint16 maximumIndex = (page + 1) * 512;
-    uint16 start = page * 512;
-
-    for (uint16 i = start; i < maximumIndex; i++) {
-      temp[i - start] = gallery[_currentId].tilesInfo[i];
-    }
-
-    return temp;
+  function getTilesInfo() public view returns (TileInfo[625] memory) {
+    return gallery[_currentId].tilesInfo;
   }
 
   function paint(
