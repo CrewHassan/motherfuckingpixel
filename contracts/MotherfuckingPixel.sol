@@ -12,17 +12,21 @@ contract MotherfuckingPixel is ERC721 {
   uint16 _currentId;
   uint16 _maxMintable;
 
-  struct Tile {
-    address payable _owner;
+  struct TileColor {
     uint8 _r;
     uint8 _g;
     uint8 _b;
+  }
+
+  struct TileInfo {
+    address payable _owner;
     uint256 _currentValue;
     uint256 _paidValue;
   }
 
   struct Canvas {
-    Tile[1024] tiles;
+    TileInfo[1024] tilesInfo;
+    TileColor[1024] tilesColor;
     uint256 cvl;
     uint256 startedAt;
     uint16 paintedTilesCount;
@@ -43,13 +47,25 @@ contract MotherfuckingPixel is ERC721 {
     _currentId = 1;
   }
 
-  function getTiles(uint8 page) public view returns (Tile[512] memory) {
+  function getTilesColor(uint8 page) public view returns (TileColor[512] memory) {
     require(page < 2, "Invalid page");
-    Tile[512] memory temp;
+    TileColor[512] memory temp;
     uint16 maximumIndex = (page + 1) * 512;
 
     for (uint16 i = page * 512; i < maximumIndex; i++) {
-      temp[i] = gallery[_currentId].tiles[i];
+      temp[i] = gallery[_currentId].tilesColor[i];
+    }
+
+    return temp;
+  }
+
+  function getTilesInfo(uint8 page) public view returns (TileInfo[512] memory) {
+    require(page < 2, "Invalid page");
+    TileInfo[512] memory temp;
+    uint16 maximumIndex = (page + 1) * 512;
+
+    for (uint16 i = page * 512; i < maximumIndex; i++) {
+      temp[i] = gallery[_currentId].tilesInfo[i];
     }
 
     return temp;
@@ -63,20 +79,21 @@ contract MotherfuckingPixel is ERC721 {
   ) public payable {
     require(msg.value >= _minPrice, "Too low");
 
-    Tile memory currentTile = gallery[_currentId].tiles[coordinate];
+    TileInfo memory currentTileInfo = gallery[_currentId].tilesInfo[coordinate];
 
-    require(msg.value > currentTile._currentValue, "Bid too low");
+    require(msg.value > currentTileInfo._currentValue, "Bid too low");
 
     uint256 newValue = msg.value + (msg.value * _step) / 100;
-    gallery[_currentId].tiles[coordinate] = Tile(payable(msg.sender), r, g, b, newValue, msg.value);
+    gallery[_currentId].tilesInfo[coordinate] = TileInfo(payable(msg.sender), newValue, msg.value);
+    gallery[_currentId].tilesColor[coordinate] = TileColor(r, g, b);
     gallery[_currentId].cvl += msg.value;
 
     emit Painted(coordinate, msg.sender, msg.value);
 
-    if (currentTile._owner == address(0)) return;
+    if (currentTileInfo._owner == address(0)) return;
 
-    uint256 fee = ((msg.value - currentTile._paidValue) * _payableFee) / 100;
-    currentTile._owner.transfer(currentTile._paidValue + fee);
+    uint256 fee = ((msg.value - currentTileInfo._paidValue) * _payableFee) / 100;
+    currentTileInfo._owner.transfer(currentTileInfo._paidValue + fee);
   }
 
   function isRunning() public view returns (bool) {
