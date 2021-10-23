@@ -16,7 +16,7 @@ describe("MotherfuckingPixel", function () {
     it("Should paint", async function () {
       const xx = 0;
       const yy = 0;
-      const coordinate = xx * 25 + yy;
+      const coordinate = xx * 16 + yy;
       const amount = ethers.utils.parseEther("0.5");
       const transaction = this.mfp.paint(coordinate, 0, 0, 0, { value: amount });
 
@@ -37,7 +37,7 @@ describe("MotherfuckingPixel", function () {
     it("returns the pixel color array", async function () {
       const xx = 0;
       const yy = 0;
-      const coordinate = xx * 25 + yy;
+      const coordinate = xx * 16 + yy;
       const amount = ethers.utils.parseEther("0.5");
       await this.mfp.paint(coordinate, 1, 0, 0, { value: amount });
 

@@ -25,8 +25,8 @@ contract MotherfuckingPixel is ERC721 {
   }
 
   struct Canvas {
-    TileInfo[625] tilesInfo;
-    TileColor[625] tilesColor;
+    TileInfo[256] tilesInfo;
+    TileColor[256] tilesColor;
     uint256 cvl;
     uint256 startedAt;
     bool finished;
@@ -46,19 +46,19 @@ contract MotherfuckingPixel is ERC721 {
     _currentId = 1;
   }
 
-  function getTilesColorById(uint16 id) public view returns (TileColor[625] memory) {
-    gallery[id].tilesColor;
-  }
-
-  function getOwnerById(uint16 id) public view returns (address) {
+  function getTilesColorById(uint16 id) public view returns (TileColor[256] memory) {
     return gallery[id].tilesColor;
   }
 
-  function getTilesColor() public view returns (TileColor[625] memory) {
+  function getOwnerById(uint16 id) public view returns (address) {
+    return gallery[id].owner;
+  }
+
+  function getTilesColor() public view returns (TileColor[256] memory) {
     return gallery[_currentId].tilesColor;
   }
 
-  function getTilesInfo() public view returns (TileInfo[625] memory) {
+  function getTilesInfo() public view returns (TileInfo[256] memory) {
     return gallery[_currentId].tilesInfo;
   }
 
@@ -103,6 +103,11 @@ contract MotherfuckingPixel is ERC721 {
     return _currentId <= _maxMintable;
   }
 
+  function withdrawAll() public {
+    require(msg.sender == _owner);
+    payable(_owner).transfer(address(this).balance);
+  }
+
   function _shouldMint() private view returns (bool) {
     return _mintProbability() > _random();
   }
@@ -120,14 +125,11 @@ contract MotherfuckingPixel is ERC721 {
 
   function _mintProbability() private view returns (uint16) {
     uint256 timestamp = block.timestamp - gallery[_currentId].startedAt;
-    if (timestamp <= 43200) {
-      // 12h
+    if (timestamp <= 43200) { // 12h
       return 1;
-    } else if (timestamp <= 72000) {
-      // 20h
+    } else if (timestamp <= 72000) { // 20h
       return 5;
-    } else if (timestamp <= 86400) {
-      // 24h
+    } else if (timestamp <= 86400) { // 24h
       return 20;
     }
     return 50;
