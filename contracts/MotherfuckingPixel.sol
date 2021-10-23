@@ -51,9 +51,10 @@ contract MotherfuckingPixel is ERC721 {
     require(page < 2, "Invalid page");
     TileColor[512] memory temp;
     uint16 maximumIndex = (page + 1) * 512;
+    uint16 start = page * 512;
 
-    for (uint16 i = page * 512; i < maximumIndex; i++) {
-      temp[i] = gallery[_currentId].tilesColor[i];
+    for (uint16 i = start; i < maximumIndex; i++) {
+      temp[i - start] = gallery[_currentId].tilesColor[i];
     }
 
     return temp;
@@ -63,9 +64,10 @@ contract MotherfuckingPixel is ERC721 {
     require(page < 2, "Invalid page");
     TileInfo[512] memory temp;
     uint16 maximumIndex = (page + 1) * 512;
+    uint16 start = page * 512;
 
-    for (uint16 i = page * 512; i < maximumIndex; i++) {
-      temp[i] = gallery[_currentId].tilesInfo[i];
+    for (uint16 i = start; i < maximumIndex; i++) {
+      temp[i - start] = gallery[_currentId].tilesInfo[i];
     }
 
     return temp;
