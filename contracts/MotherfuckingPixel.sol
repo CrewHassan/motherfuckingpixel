@@ -29,7 +29,6 @@ contract MotherfuckingPixel is ERC721 {
     TileColor[625] tilesColor;
     uint256 cvl;
     uint256 startedAt;
-    uint16 paintedTilesCount;
     bool finished;
     address owner;
   }
@@ -72,11 +71,9 @@ contract MotherfuckingPixel is ERC721 {
     gallery[_currentId].tilesColor[coordinate] = TileColor(r, g, b);
     gallery[_currentId].cvl += msg.value;
 
-    if (gallery[_currentId].paintedTilesCount == 0) {
+    if (gallery[_currentId].startedAt == 0) {
       gallery[_currentId].startedAt = block.timestamp;
     }
-
-    gallery[_currentId].paintedTilesCount += 1;
 
     if (_shouldMint()) {
       _customMint(msg.sender);
@@ -112,16 +109,16 @@ contract MotherfuckingPixel is ERC721 {
   function _mintProbability() private view returns (uint16) {
     uint256 timestamp = block.timestamp - gallery[_currentId].startedAt;
     if (timestamp <= 43200) { // 12h
-      return 100 + 100 * gallery[_currentId].paintedTilesCount / 1024;
+      return 1;
     } else if (timestamp <= 72000) { // 20h
-      return 200 + 100 * uint16(timestamp / 72000);
+      return 5;
     } else if (timestamp <= 86400) { // 24h
-      return  500 * 100 * gallery[_currentId].paintedTilesCount / 1024;
+      return 20;
     }
-    return 5000;
+    return 50;
   }
 
   function _random() private view returns (uint8) {
-    return uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % 10000);
+    return uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % 100);
   }
 }
