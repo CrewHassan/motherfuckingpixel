@@ -39,7 +39,7 @@ describe("MotherfuckingPixel", function () {
       const yy = 0;
       const coordinate = xx * 32 + yy;
       const amount = ethers.utils.parseEther("0.5");
-      const transaction = this.mfp.paint(coordinate, 0, 0, 0, { value: amount });
+      await this.mfp.paint(coordinate, 0, 0, 0, { value: amount });
 
       const tiles = await this.mfp.getTiles(0);
       expect(tiles[coordinate]._owner).to.equal(this.deployer.address);
