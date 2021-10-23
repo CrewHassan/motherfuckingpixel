@@ -51,7 +51,7 @@ contract MotherfuckingPixel is ERC721 {
   }
 
   function getOwnerById(uint16 id) public view returns (address) {
-    gallery[id].owner;
+    return gallery[id].tilesColor;
   }
 
   function getTilesColor() public view returns (TileColor[625] memory) {
@@ -120,11 +120,14 @@ contract MotherfuckingPixel is ERC721 {
 
   function _mintProbability() private view returns (uint16) {
     uint256 timestamp = block.timestamp - gallery[_currentId].startedAt;
-    if (timestamp <= 43200) { // 12h
+    if (timestamp <= 43200) {
+      // 12h
       return 1;
-    } else if (timestamp <= 72000) { // 20h
+    } else if (timestamp <= 72000) {
+      // 20h
       return 5;
-    } else if (timestamp <= 86400) { // 24h
+    } else if (timestamp <= 86400) {
+      // 24h
       return 20;
     }
     return 50;
