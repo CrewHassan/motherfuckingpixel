@@ -46,6 +46,14 @@ contract MotherfuckingPixel is ERC721 {
     _currentId = 1;
   }
 
+  function getTilesColorById(uint16 id) public view returns (TileColor[625] memory) {
+    return gallery[id].tilesColor;
+  }
+
+  function getOwnerById(uint16 id) public view returns (address) {
+    return gallery[id].owner;
+  }
+
   function getTilesColor() public view returns (TileColor[625] memory) {
     return gallery[_currentId].tilesColor;
   }
