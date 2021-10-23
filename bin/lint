@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+source "./bin/functions"
+
+pp_info "test" "Running linters..."
+yarn lint
+pp_info "test" "Done!"

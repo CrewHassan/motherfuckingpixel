@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+source "./bin/functions"
+
+pp_info "deploy" "Compiling and deploying contracts..."
+yarn hardhat run --network ${1:-localhost} scripts/deploy.ts
+pp_info "deploy" "Done!"
