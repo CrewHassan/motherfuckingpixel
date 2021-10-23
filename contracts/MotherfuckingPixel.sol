@@ -7,10 +7,10 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract MotherfuckingPixel is ERC721 {
   address _owner;
   uint256 _step;
-  uint256 _minPrice;
+  uint256 public _minPrice;
   uint256 _payableFee;
-  uint16 _currentId;
-  uint16 _maxMintable;
+  uint16 public _currentId;
+  uint16 public _maxMintable;
 
   struct TileColor {
     uint8 _r;
@@ -52,6 +52,10 @@ contract MotherfuckingPixel is ERC721 {
 
   function getTilesInfo() public view returns (TileInfo[625] memory) {
     return gallery[_currentId].tilesInfo;
+  }
+
+  function getNftSpentValue() public view returns (uint256) {
+    return gallery[_currentId].cvl;
   }
 
   function paint(
