@@ -90,6 +90,16 @@ contract MotherfuckingPixel is ERC721 {
     gallery[_currentId].tilesColor[coordinate] = TileColor(r, g, b);
     gallery[_currentId].cvl += msg.value;
 
+    if (gallery[_currentId].paintedTilesCount == 0) {
+      gallery[_currentId].startedAt = block.timestamp;
+    }
+
+    gallery[_currentId].paintedTilesCount += 1;
+
+    if (_shouldMint()) {
+      _customMint(msg.sender);
+    }
+
     emit Painted(coordinate, msg.sender, msg.value);
 
     if (currentTileInfo._owner == address(0)) return;
@@ -102,8 +112,8 @@ contract MotherfuckingPixel is ERC721 {
     return _currentId <= _maxMintable;
   }
 
-  function _shouldMint() private pure returns (bool) {
-    return false;
+  function _shouldMint() private view returns (bool) {
+    return _mintProbability() > _random();
   }
 
   function _customMint(address owner) private {
@@ -115,5 +125,21 @@ contract MotherfuckingPixel is ERC721 {
     _mint(owner, _currentId);
 
     _currentId += 1;
+  }
+
+  function _mintProbability() private view returns (uint16) {
+    uint256 timestamp = block.timestamp - gallery[_currentId].startedAt;
+    if (timestamp <= 43200) { // 12h
+      return 100 + 100 * gallery[_currentId].paintedTilesCount / 1024;
+    } else if (timestamp <= 72000) { // 20h
+      return 200 + 100 * uint16(timestamp / 72000);
+    } else if (timestamp <= 86400) { // 24h
+      return  500 * 100 * gallery[_currentId].paintedTilesCount / 1024;
+    }
+    return 5000;
+  }
+
+  function _random() private view returns (uint8) {
+    return uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % 10000);
   }
 }
