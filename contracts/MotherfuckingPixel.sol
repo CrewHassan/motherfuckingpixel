@@ -66,7 +66,7 @@ contract MotherfuckingPixel is ERC721 {
     return gallery[_currentId].cvl;
   }
 
-  function changePixel(
+  function _changePixel(
     uint256 pack,
     uint32 idx,
     uint32 rgba
@@ -99,7 +99,7 @@ contract MotherfuckingPixel is ERC721 {
 
     Canvas storage canvas = gallery[_currentId];
 
-    canvas.packs[packIdx] = changePixel(canvas.packs[packIdx], uint32(innerIdx), pixel);
+    canvas.packs[packIdx] = _changePixel(canvas.packs[packIdx], uint32(innerIdx), pixel);
     canvas.tilesInfo[coordinate] = TileInfo(payable(msg.sender), newValue, msg.value);
     canvas.cvl += msg.value;
 
