@@ -36,7 +36,7 @@ describe("MotherfuckingPixel", function () {
       await expect(() => newTransaction).to.changeEtherBalance(this.deployer, payableFee);
     });
 
-    it.only("returns the pixel color array", async function () {
+    it("returns the pixel color array", async function () {
       const xx = 0;
       const yy = 0;
       const coordinate = xx * 16 + yy;
