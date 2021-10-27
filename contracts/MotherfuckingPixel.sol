@@ -3,8 +3,12 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./PixelPack.sol";
+import "hardhat/console.sol";
 
 contract MotherfuckingPixel is ERC721 {
+  using PixelPack for uint256;
+
   address _owner;
   uint256 _step;
   uint256 public _minPrice;
@@ -12,21 +16,19 @@ contract MotherfuckingPixel is ERC721 {
   uint16 public _currentId;
   uint16 public _maxMintable;
 
-  struct TileColor {
-    uint8 _r;
-    uint8 _g;
-    uint8 _b;
-  }
-
   struct TileInfo {
     address payable _owner;
     uint256 _currentValue;
     uint256 _paidValue;
   }
 
+  uint256 public constant Width = 16;
+  uint256 public constant PixelCount = Width * Width;
+  uint256 public constant PackCount = PixelCount / 8;
+
   struct Canvas {
-    TileInfo[256] tilesInfo;
-    TileColor[256] tilesColor;
+    TileInfo[PixelCount] tilesInfo;
+    uint256[PackCount] packs;
     uint256 cvl;
     uint256 startedAt;
     bool finished;
@@ -46,19 +48,19 @@ contract MotherfuckingPixel is ERC721 {
     _currentId = 1;
   }
 
-  function getTilesColorById(uint16 id) public view returns (TileColor[256] memory) {
-    return gallery[id].tilesColor;
+  function getTilesColorById(uint16 id) public view returns (uint256[PackCount] memory) {
+    return gallery[id].packs;
+  }
+
+  function getTilesColor() public view returns (uint256[PackCount] memory) {
+    return getTilesColorById(_currentId);
   }
 
   function getOwnerById(uint16 id) public view returns (address) {
     return gallery[id].owner;
   }
 
-  function getTilesColor() public view returns (TileColor[256] memory) {
-    return gallery[_currentId].tilesColor;
-  }
-
-  function getTilesInfo() public view returns (TileInfo[256] memory) {
+  function getTilesInfo() public view returns (TileInfo[PixelCount] memory) {
     return gallery[_currentId].tilesInfo;
   }
 
@@ -70,7 +72,8 @@ contract MotherfuckingPixel is ERC721 {
     uint16 coordinate,
     uint8 r,
     uint8 g,
-    uint8 b
+    uint8 b,
+    uint8 a
   ) public payable {
     require(msg.value >= _minPrice, "Too low");
 
@@ -78,9 +81,13 @@ contract MotherfuckingPixel is ERC721 {
 
     require(msg.value > currentTileInfo._currentValue, "Bid too low");
 
+    uint256 packIdx = coordinate / PackCount;
+    uint256 innerIdx = coordinate % PackCount;
+    uint32 pixel = (uint32(r) << 24) | (uint32(g) << 16) | (uint32(b) << 8) | uint32(a);
+
     uint256 newValue = msg.value + (msg.value * _step) / 100;
+    gallery[_currentId].packs[packIdx] = PixelPack.change(gallery[_currentId].packs[packIdx], uint32(innerIdx), pixel);
     gallery[_currentId].tilesInfo[coordinate] = TileInfo(payable(msg.sender), newValue, msg.value);
-    gallery[_currentId].tilesColor[coordinate] = TileColor(r, g, b);
     gallery[_currentId].cvl += msg.value;
 
     if (gallery[_currentId].startedAt == 0) {
@@ -88,8 +95,10 @@ contract MotherfuckingPixel is ERC721 {
     }
 
     if (_shouldMint()) {
+      console.log("minting");
       _customMint(msg.sender);
     }
+    console.log(_currentId);
 
     emit Painted(coordinate, msg.sender, msg.value);
 
@@ -125,11 +134,14 @@ contract MotherfuckingPixel is ERC721 {
 
   function _mintProbability() private view returns (uint16) {
     uint256 timestamp = block.timestamp - gallery[_currentId].startedAt;
-    if (timestamp <= 43200) { // 12h
+    if (timestamp <= 43200) {
+      // 12h
       return 1;
-    } else if (timestamp <= 72000) { // 20h
+    } else if (timestamp <= 72000) {
+      // 20h
       return 5;
-    } else if (timestamp <= 86400) { // 24h
+    } else if (timestamp <= 86400) {
+      // 24h
       return 20;
     }
     return 50;
