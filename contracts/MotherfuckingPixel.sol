@@ -7,8 +7,6 @@ import "./PixelPack.sol";
 import "hardhat/console.sol";
 
 contract MotherfuckingPixel is ERC721 {
-  using PixelPack for uint256;
-
   address _owner;
   uint256 _step;
   uint256 public _minPrice;
@@ -68,6 +66,18 @@ contract MotherfuckingPixel is ERC721 {
     return gallery[_currentId].cvl;
   }
 
+  function changePixel(
+    uint256 pack,
+    uint32 idx,
+    uint32 rgba
+  ) internal pure returns (uint256) {
+    uint256 shift = (7 - idx) * 32;
+    uint256 pixel = uint256(rgba) << shift;
+    uint256 mask = ~(((1 << 32) - 1) << shift);
+
+    return (pack & mask) | pixel;
+  }
+
   function paint(
     uint16 coordinate,
     uint8 r,
@@ -86,12 +96,15 @@ contract MotherfuckingPixel is ERC721 {
     uint32 pixel = (uint32(r) << 24) | (uint32(g) << 16) | (uint32(b) << 8) | uint32(a);
 
     uint256 newValue = msg.value + (msg.value * _step) / 100;
-    gallery[_currentId].packs[packIdx] = PixelPack.change(gallery[_currentId].packs[packIdx], uint32(innerIdx), pixel);
-    gallery[_currentId].tilesInfo[coordinate] = TileInfo(payable(msg.sender), newValue, msg.value);
-    gallery[_currentId].cvl += msg.value;
 
-    if (gallery[_currentId].startedAt == 0) {
-      gallery[_currentId].startedAt = block.timestamp;
+    Canvas storage canvas = gallery[_currentId];
+
+    canvas.packs[packIdx] = changePixel(canvas.packs[packIdx], uint32(innerIdx), pixel);
+    canvas.tilesInfo[coordinate] = TileInfo(payable(msg.sender), newValue, msg.value);
+    canvas.cvl += msg.value;
+
+    if (canvas.startedAt == 0) {
+      canvas.startedAt = block.timestamp;
     }
 
     if (_shouldMint()) {
