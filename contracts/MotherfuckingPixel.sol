@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MotherfuckingPixel is ERC721, Ownable {
@@ -124,11 +123,14 @@ contract MotherfuckingPixel is ERC721, Ownable {
 
   function _mintProbability() private view returns (uint16) {
     uint256 timestamp = block.timestamp - gallery[_currentId].startedAt;
-    if (timestamp <= 43200) { // 12h
+    if (timestamp <= 43200) {
+      // 12h
       return 1;
-    } else if (timestamp <= 72000) { // 20h
+    } else if (timestamp <= 72000) {
+      // 20h
       return 5;
-    } else if (timestamp <= 86400) { // 24h
+    } else if (timestamp <= 86400) {
+      // 24h
       return 20;
     }
     return 50;
