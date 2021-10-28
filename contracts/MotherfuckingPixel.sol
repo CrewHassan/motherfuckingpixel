@@ -1,10 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./PixelPack.sol";
-import "hardhat/console.sol";
 
 contract MotherfuckingPixel is ERC721 {
   address _owner;
@@ -108,10 +105,8 @@ contract MotherfuckingPixel is ERC721 {
     }
 
     if (_shouldMint()) {
-      console.log("minting");
       _customMint(msg.sender);
     }
-    console.log(_currentId);
 
     emit Painted(coordinate, msg.sender, msg.value);
 
