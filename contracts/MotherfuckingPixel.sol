@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MotherfuckingPixel is ERC721 {
-  address _owner;
+contract MotherfuckingPixel is ERC721, Ownable {
   uint256 _step;
   uint256 public _minPrice;
   uint256 _payableFee;
@@ -38,7 +38,6 @@ contract MotherfuckingPixel is ERC721 {
   event Painted(uint16 coordinate, address indexed owner, uint256 value);
 
   constructor() ERC721("MfPGallery", "MfPG") {
-    _owner = msg.sender;
     _minPrice = 0.05 ether;
     _step = 5;
     _payableFee = 95;
@@ -103,9 +102,8 @@ contract MotherfuckingPixel is ERC721 {
     return _currentId <= _maxMintable;
   }
 
-  function withdrawAll() public {
-    require(msg.sender == _owner);
-    payable(_owner).transfer(address(this).balance);
+  function withdrawAll() public onlyOwner {
+    payable(_msgSender()).transfer(address(this).balance);
   }
 
   function _shouldMint() private view returns (bool) {
@@ -125,11 +123,14 @@ contract MotherfuckingPixel is ERC721 {
 
   function _mintProbability() private view returns (uint16) {
     uint256 timestamp = block.timestamp - gallery[_currentId].startedAt;
-    if (timestamp <= 43200) { // 12h
+    if (timestamp <= 43200) {
+      // 12h
       return 1;
-    } else if (timestamp <= 72000) { // 20h
+    } else if (timestamp <= 72000) {
+      // 20h
       return 5;
-    } else if (timestamp <= 86400) { // 24h
+    } else if (timestamp <= 86400) {
+      // 24h
       return 20;
     }
     return 50;

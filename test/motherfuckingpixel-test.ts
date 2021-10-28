@@ -47,4 +47,18 @@ describe("MotherfuckingPixel", function () {
       expect(tilesInfo[coordinate]._owner).to.equal(this.deployer.address);
     });
   });
+
+  describe('withdrawAll', ()=>{
+    it('is callable by the owner', async function () {
+      await this.mfp.withdrawAll();
+    });
+
+    it('is not callable by a non-owner', async function () {
+      const tx = this.mfp.connect(this.otherUser).withdrawAll();
+
+      await expect(tx).to.be.revertedWith('Ownable: caller is not the owner');
+
+    });
+  })
 });
+
